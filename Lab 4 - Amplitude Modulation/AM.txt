@@ -1,0 +1,30 @@
+close all; 
+clear all;
+fs = 2000;                              % Sampling frequency
+f = 5;                                  % Signal frequency
+fc = 250;                               % Carrier frequency
+N = 2000;                               % Use 1 sec of data
+t = (1:N)/fs;                           % Time axis for plotting
+wn = .02;                               % PSD lowpass filter cut - off frequency
+[b,a] = butter(2,wn);                   % Design lowpass filter
+% Generate AM signal
+w = (1:N)* 2*pi*fc/fs;                  % Carrier frequency = 250 Hz
+w1 = (1:N)*2*pi*f/fs;                   % Signal frequency = 5 Hz
+vc = sin(w);                            % Define carrier
+vsig = sawtooth(w1,.5);                 % Define signal
+vm = (1 + .5 * vsig) .* vc;             % Create modulated signal with a Modulation constant = 0.5
+subplot(3,1,1);
+plot(t,vm,'k');                         % Plot AM Signal....axis, label,title.......
+% Add noise with 3.16 times power (10 db) of signal for SNR of -10 db
+noise = randn(1,N);
+scale = (var(vsig)/var(noise)) * 3.16;
+vm = vm + noise * scale;                % Add noise to modulated signal
+subplot(3,1,2);
+plot(t,vm,'k');                         % Plot AM signal..axis, label,title.......
+% Phase sensitive detection
+ishift = fix(.125 * fs/fc);             % Shift carrier by 1/4
+vc = [vc(ishift:N) vc(1:ishift-1)];     % period (45 deg) using periodic shift
+v1 = vc .* vm;                          % Multiplier
+vout = filter(b,a,v1);                  % Apply lowpass filter
+subplot(3,1,3);
+plot(t,vout,'k');                       % Plot AM Signal
