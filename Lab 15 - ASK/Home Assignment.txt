@@ -1,0 +1,3 @@
+-Write a program that converts a message to binary using ASCII transformation.
+-send it using ASK
+-demodulate it to get the message again
